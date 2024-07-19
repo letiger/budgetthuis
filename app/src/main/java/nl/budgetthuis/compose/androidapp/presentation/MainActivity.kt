@@ -5,19 +5,43 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import nl.budgetthuis.compose.androidapp.R
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import dagger.hilt.android.AndroidEntryPoint
+import nl.budgetthuis.compose.androidapp.presentation.features.coindetails.CoinDetailScreenContainer
+import nl.budgetthuis.compose.androidapp.presentation.features.coinlist.CoinListScreenContainer
 import nl.budgetthuis.compose.androidapp.presentation.theme.AndroidAppTheme
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             AndroidAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
-                    Text(text = stringResource(id = R.string.app_name))
+                    val navController = rememberNavController()
+                    NavHost(
+                        navController = navController,
+                        startDestination = Screen.CoinListScreen.route
+                    ) {
+                        composable(route = Screen.CoinListScreen.route) {
+                            CoinListScreenContainer(navController = navController)
+                        }
+                        composable(
+                            route = Screen.CoinDetailsScreen.route + "/{${Screen.CoinDetailsScreen.NAV_ARG_COIN_ID}}",
+                            arguments = listOf(
+                                navArgument(Screen.CoinDetailsScreen.NAV_ARG_COIN_ID) {
+                                    type = NavType.StringType
+                                }
+                            )
+                        ) {
+                            CoinDetailScreenContainer()
+                        }
+                    }
                 }
             }
         }
